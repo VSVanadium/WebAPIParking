@@ -12,7 +12,7 @@ namespace WebAPIParking.Models
         public VehicleType Type { get; set; }
         public int Floor { get; set; }
         public int Slot { get; set; }
-
+        public DateTime CheckIn { get; set; }
         public ParkingModel()
         {
             Id = "0";

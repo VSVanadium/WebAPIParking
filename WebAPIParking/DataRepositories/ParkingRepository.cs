@@ -23,7 +23,7 @@ namespace WebAPIParking.DataRepositories
         {
             try
             {
-                if (_dbContext.ParkedVehicles.Any(p => p.Id == vehicleId)) return new ParkingResponse(null, "The vehicle with Id: "+ vehicleId+" already checked in.", HttpStatusCode.Conflict);
+                if (_dbContext.ParkedVehicles.Any(p => p.Id == vehicleId)) return new ParkingResponse(null,0, "The vehicle with Id: "+ vehicleId+" already checked in.", HttpStatusCode.Conflict);
 
                 var avaliableSlot = _dbContext.Slots.FirstOrDefault(p => p.SlotType == vehicleType && !p.IsOccupied);
                 if (avaliableSlot != null)
@@ -33,6 +33,7 @@ namespace WebAPIParking.DataRepositories
                     newParking.Type = vehicleType;
                     newParking.Floor = avaliableSlot.FloorId;
                     newParking.Slot = avaliableSlot.Id;
+                    newParking.CheckIn = DateTime.UtcNow;
 
                     _dbContext.Add(newParking);
                    
@@ -54,17 +55,17 @@ namespace WebAPIParking.DataRepositories
                     }
 
                     await _dbContext.SaveChangesAsync();
-                    return new ParkingResponse(newParking, "success", HttpStatusCode.OK);
+                    return new ParkingResponse(newParking,0, "success", HttpStatusCode.OK);
                 }
 
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                return new ParkingResponse(null, ex.Message, HttpStatusCode.BadRequest);
+                return new ParkingResponse(null,0, ex.Message, HttpStatusCode.BadRequest);
             }
 
-            return new ParkingResponse(null, "Unknow Error", HttpStatusCode.BadRequest);
+            return new ParkingResponse(null,0, "Unknow Error", HttpStatusCode.BadRequest);
         }
 
         public async Task<ParkingResponse> CheckOut(string vehicleId)
@@ -74,6 +75,9 @@ namespace WebAPIParking.DataRepositories
                 var parkingInfo = _dbContext.ParkedVehicles.Where(p => p.Id == vehicleId).FirstOrDefault();
                 if (parkingInfo != null)
                 {
+
+                    var price = CalculatePrice(parkingInfo);
+
                     _dbContext.Remove(parkingInfo);
 
                     var slotToBeUpadated = _dbContext.Slots.FirstOrDefault(s => s.Id == parkingInfo.Slot);
@@ -99,16 +103,34 @@ namespace WebAPIParking.DataRepositories
 
 
                     await _dbContext.SaveChangesAsync();
-                    return new ParkingResponse(parkingInfo, "The Vehicle with id: " + parkingInfo.Id + " has been sucessfully checked out.", HttpStatusCode.OK);
+                    return new ParkingResponse(parkingInfo, price, "The Vehicle with id: " + parkingInfo.Id + " has been sucessfully checked out.", HttpStatusCode.OK);
                 }
             }
             catch (Exception ex)
             {
-                return new ParkingResponse(null, ex.Message, HttpStatusCode.BadRequest);
+                return new ParkingResponse(null,0, ex.Message, HttpStatusCode.BadRequest);
             }
 
 
-            return new ParkingResponse(null, "Unknow Error", HttpStatusCode.BadRequest);
+            return new ParkingResponse(null,0, "Unknow Error", HttpStatusCode.BadRequest);
+        }
+
+        private float CalculatePrice(ParkingModel  parking)
+        {
+            float caluatedPrice = 0.0f;
+            DateTime checkIn = parking.CheckIn;
+            var minutes = (DateTime.UtcNow - checkIn).TotalMinutes;
+            var hours = (DateTime.UtcNow - checkIn).TotalHours;
+
+            if (minutes < 15)
+                return 0;
+
+            if (hours < 24)
+                caluatedPrice = (float)(hours * 3);
+            else
+                caluatedPrice = 50.0f;
+
+            return caluatedPrice;
         }
     }
 }

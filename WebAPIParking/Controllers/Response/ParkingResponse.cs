@@ -7,10 +7,11 @@ namespace WebAPIParking.Controllers.Response
     {
 
         public ParkingModel? Parking { get; set; }
+        public float Price {get;set;}
         public string? Message   { get; set; }
         public HttpStatusCode HttpCode { get; set; }
 
-        public ParkingResponse(ParkingModel parking, string message, HttpStatusCode code)
+        public ParkingResponse(ParkingModel parking, float price, string message, HttpStatusCode code)
         {
             this.Parking = parking; 
             this.Message = message;
