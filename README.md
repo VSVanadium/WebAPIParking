@@ -10,6 +10,10 @@ Whole day pass for Cras is 50 Euros and 20 Euros for motorbikes respectively.
 
 The vehicle cannot be parked twice, and system should reject next parking is parking space is full.
 
+## project
+
+The project is implemented using .Net Core 6 and Entity Framework. Please open the project solution file in visual studio.  
+
 ## Database
 
 The project uses peristent database (LocalDB) located unter AppData folder. Make sure you have SQL express installed on your machine.
