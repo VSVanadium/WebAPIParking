@@ -2,6 +2,7 @@
 using System.Configuration;
 using WebAPIParking.Controllers;
 using WebAPIParking.DataRepositories;
+using WebAPIParking.Models;
 
 namespace WebAPIParking
 {
@@ -17,7 +18,11 @@ namespace WebAPIParking
 
             services.AddScoped<ParkingController>();
             services.AddScoped<FloorController>();
+            services.AddScoped<HomeController>();
+            services.AddControllers();
 
+
+            services.AddTransient<IGenericRepository<ParkingModel>, GenericRepository<ParkingModel>>();
             services.AddScoped<ParkingRepository>();
             services.AddScoped<FloorRepository>();
             services.AddScoped<SlotRepository>();
