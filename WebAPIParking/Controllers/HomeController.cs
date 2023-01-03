@@ -25,8 +25,7 @@ namespace WebAPIParking.Controllers
         [Route("GetId")]
         public ActionResult<ParkingModel> GetId(string id)
         {
-            var models = repo.GetAll();
-            var model = models.FirstOrDefault(x=>x.Id == id);
+            var model = repo.GetAll().FirstOrDefault(x => x.Id == id);
             return Ok(model);
         }
 
