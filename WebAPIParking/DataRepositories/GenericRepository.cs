@@ -18,9 +18,5 @@ namespace WebAPIParking.DataRepositories
             return table.ToList();
         }
 
-        public T GetById(object id)
-        {
-            return table.Find(id);
-        }
     }
 }

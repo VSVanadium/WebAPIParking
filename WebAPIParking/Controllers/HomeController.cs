@@ -21,5 +21,14 @@ namespace WebAPIParking.Controllers
             return Ok(model);
         }
 
+        [HttpGet]
+        [Route("GetId")]
+        public ActionResult<ParkingModel> GetId(string id)
+        {
+            var models = repo.GetAll();
+            var model = models.FirstOrDefault(x=>x.Id == id);
+            return Ok(model);
+        }
+
     }
 }

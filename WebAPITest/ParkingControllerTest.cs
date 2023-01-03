@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using WebAPIParking.Controllers;
+using WebAPIParking.Data;
 using WebAPIParking.DataRepositories;
 using WebAPIParking.Models;
 
@@ -27,12 +28,43 @@ namespace WebAPITest
 
             var actionResult = controller.GetAll();
             var result = actionResult.Result as OkObjectResult;
-            var actual = result.Value as IEnumerable<ParkingModel>;
+            var actual = result?.Value as IEnumerable<ParkingModel>;
 
 
             Assert.IsType<OkObjectResult>(result);
-            Assert.Equal(parkedVehicles.Count, actual.Count());
+            Assert.Equal(parkedVehicles.Count, actual?.Count());
         }
+
+        [Theory(DisplayName = "Get parking for the Vehile")]
+        [InlineData("DDF2D")]      
+        public void GetParkingByID_Test(string Id)
+        {
+            var parkedVehicles = GetSampleParkings();
+            service.Setup(x => x.GetAll()).Returns(GetSampleParkings);
+
+            var controller = new HomeController(service.Object);
+
+
+            var actionResult = controller.GetId(Id);
+            var result = actionResult.Result as OkObjectResult;
+            var actual = result?.Value as ParkingModel;
+
+            Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(Id, actual?.Id);
+
+
+        }
+
+
+        [Theory(DisplayName = "Check-In new Vehicle")]
+        [InlineData("DRFC7-X", VehicleType.Car)]
+        public void CheckIn_Test(string id, VehicleType vehicleType)
+        {
+        }
+
+
+        //Method for check-in, success, failure
+        //checkout
 
 
         private List<ParkingModel> GetSampleParkings()
